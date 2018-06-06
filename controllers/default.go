@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
+	"dg/services"
+	"fmt"
 )
 
 type MainController struct {
@@ -9,7 +11,10 @@ type MainController struct {
 }
 
 func (c *MainController) Get() {
-	c.Data["Website"] = "beego.me"
-	c.Data["Email"] = "astaxie@gmail.com"
-	c.TplName = "index.tpl"
+	commonSrv := &services.CommonSrv{}
+	salt := commonSrv.RandomString(8)
+	fmt.Println(salt)
+	pwd := "wangyu"
+	pwdEc := commonSrv.GenPwd(pwd, salt)
+	fmt.Println(pwdEc)
 }

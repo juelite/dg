@@ -8,7 +8,3 @@ import (
 func main() {
 	beego.Run()
 }
-
-func connectDb()  {
-	
-}
