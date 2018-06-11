@@ -9,7 +9,7 @@ import (
 //用户模型
 type Users struct {
 	Id 					int
-	Phone				string			//手机号码
+	Email				string			//邮箱
 	Password 			string			//密码
 	Salt 			    string			//盐
 	CreateTime			time.Time
@@ -29,6 +29,13 @@ func (u *Users) Add(o orm.Ormer, user Users) (int64, error) {
 	user.Password = commonSrv.GenPwd(user.Password, user.Salt)
 	id, err := o.Insert(&user)
 	return id, err
+}
+
+//获取用户
+func (u *Users) GetUserByPhone(email string) (users Users, err error) {
+	o := orm.NewOrm()
+	err = o.QueryTable(u).Filter("email__eq", email).One(&users)
+	return
 }
 
 //修改密码

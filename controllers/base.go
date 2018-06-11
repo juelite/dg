@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego/validation"
 	"reflect"
 	"strings"
+	"dg/controllers/structs"
 )
 
 type BaseController struct {
@@ -21,12 +22,27 @@ func (b *BaseController) RequestData(param interface{}) {
 	valida.Valid(param)
 	message := ""
 	if valida.HasErrors() {
+		var field string
 		for _ , e := range valida.Errors {
-			message = e.Key + " " + e.Message
-			break
+			if e.Tmpl == "格式不正确" {
+				message = "格式不正确"
+				field = e.Field
+				break
+			} else {
+				message = e.Message
+				field = e.Field
+				break
+			}
+
+		}
+		cnField := structs.GetCnField(field)
+		if cnField != "" {
+			message = cnField + message
+		} else {
+			message = field + " " + message
 		}
 		var data map[string]interface{}
-		b.ReturnData( 3999 , message , data)
+		b.ReturnData(structs.ERROR_CODE , message , data)
 	}
 }
 
@@ -43,6 +59,8 @@ func (b *BaseController) ReturnData(code int, message string, data map[string]in
 		"message": message,
 		"data":    data,
 	}
+	b.Ctx.Output.Header("Access-Control-Allow-Origin", "*")
+	b.Ctx.Output.Header("Access-Control-Allow-Headers", "X-Requested-With,accept, origin, content-type")
 	b.ServeJSON()
 	b.StopRun()
 }
